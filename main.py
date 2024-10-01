@@ -65,7 +65,7 @@ class AVLNode:
 # AVL Tree for maintaining sorted rooms
 class AVLTree:
     def insert(self, root, key):
-        # 1. Perform the normal BST insertion
+        # Perform the normal BST insertion
         if root is None:
             return AVLNode(key)
         elif key < root.key:
@@ -73,10 +73,10 @@ class AVLTree:
         else:
             root.right = self.insert(root.right, key)
 
-        # 2. Update the height of this ancestor node
+        # Update the height of this ancestor node
         root.height = 1 + max(self.get_height(root.left), self.get_height(root.right))
 
-        # 3. Get the balance factor
+        # Get the balance factor
         balance = self.get_balance(root)
 
         # If the node becomes unbalanced, then there are 4 cases
@@ -102,7 +102,7 @@ class AVLTree:
         return root
 
     def delete_node(self, root, key):
-        # STEP 1: PERFORM STANDARD BST DELETE
+        # PERFORM STANDARD BST DELETE
         if root is None:
             return root
 
@@ -121,10 +121,10 @@ class AVLTree:
             root.key = temp.key
             root.right = self.delete_node(root.right, temp.key)
 
-        # STEP 2: UPDATE HEIGHT OF THIS ANCESTOR NODE
+        # UPDATE HEIGHT OF THIS ANCESTOR NODE
         root.height = 1 + max(self.get_height(root.left), self.get_height(root.right))
 
-        # STEP 3: GET THE BALANCE FACTOR OF THIS ANCESTOR NODE
+        # GET THE BALANCE FACTOR OF THIS ANCESTOR NODE
         balance = self.get_balance(root)
 
         # If this node becomes unbalanced, then there are 4 cases
@@ -297,7 +297,7 @@ if __name__ == "__main__":
     chanel = ['Channel 1', 'Channel 2', 'Channel 3']
 
     # Adding guests to rooms
-    for i in range(2000000):
+    for i in range(10000):
         hotel.add_guest(i, ch(chanel))
 
     # Writing data to file
