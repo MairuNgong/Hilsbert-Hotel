@@ -45,7 +45,7 @@ class HashMap:
             if pair[0] == key:
                 return True
         return False
-# ==========================================================
+
     # Get all keys in the HashMap (for debugging purposes)
     def keys(self):
         all_keys = []
@@ -53,45 +53,59 @@ class HashMap:
             for pair in bucket:
                 all_keys.append(pair[0])
         return all_keys
-# ==========================================================
 
-# Node class for the binary search tree
-class TreeNode:
+# Node class for the AVL tree
+class AVLNode:
     def __init__(self, key):
         self.key = key
         self.left = None
         self.right = None
+        self.height = 1  # New nodes are initially added at leaf
 
-# Binary Search Tree (BST) for maintaining sorted rooms
-class RoomBST:
-    def __init__(self):
-        self.root = None
-
-    # Helper function to insert a key in the BST
+# AVL Tree for maintaining sorted rooms
+class AVLTree:
     def insert(self, root, key):
+        # 1. Perform the normal BST insertion
         if root is None:
-            return TreeNode(key)
-        if key < root.key:
+            return AVLNode(key)
+        elif key < root.key:
             root.left = self.insert(root.left, key)
         else:
             root.right = self.insert(root.right, key)
+
+        # 2. Update the height of this ancestor node
+        root.height = 1 + max(self.get_height(root.left), self.get_height(root.right))
+
+        # 3. Get the balance factor
+        balance = self.get_balance(root)
+
+        # If the node becomes unbalanced, then there are 4 cases
+
+        # Left Left Case
+        if balance > 1 and key < root.left.key:
+            return self.right_rotate(root)
+
+        # Right Right Case
+        if balance < -1 and key > root.right.key:
+            return self.left_rotate(root)
+
+        # Left Right Case
+        if balance > 1 and key > root.left.key:
+            root.left = self.left_rotate(root.left)
+            return self.right_rotate(root)
+
+        # Right Left Case
+        if balance < -1 and key < root.right.key:
+            root.right = self.right_rotate(root.right)
+            return self.left_rotate(root)
+
         return root
 
-    # Function to add a room number to the BST
-    def add_room(self, key):
-        self.root = self.insert(self.root, key)
-
-    # Helper function to find the inorder successor (used in deletion)
-    def min_value_node(self, node):
-        current = node
-        while current.left is not None:
-            current = current.left
-        return current
-
-    # Helper function to delete a key in the BST
     def delete_node(self, root, key):
+        # STEP 1: PERFORM STANDARD BST DELETE
         if root is None:
             return root
+
         if key < root.key:
             root.left = self.delete_node(root.left, key)
         elif key > root.key:
@@ -101,23 +115,90 @@ class RoomBST:
                 return root.right
             elif root.right is None:
                 return root.left
+
+            # Node with two children: Get the inorder successor (smallest in the right subtree)
             temp = self.min_value_node(root.right)
             root.key = temp.key
             root.right = self.delete_node(root.right, temp.key)
+
+        # STEP 2: UPDATE HEIGHT OF THIS ANCESTOR NODE
+        root.height = 1 + max(self.get_height(root.left), self.get_height(root.right))
+
+        # STEP 3: GET THE BALANCE FACTOR OF THIS ANCESTOR NODE
+        balance = self.get_balance(root)
+
+        # If this node becomes unbalanced, then there are 4 cases
+
+        # Left Left Case
+        if balance > 1 and self.get_balance(root.left) >= 0:
+            return self.right_rotate(root)
+
+        # Left Right Case
+        if balance > 1 and self.get_balance(root.left) < 0:
+            root.left = self.left_rotate(root.left)
+            return self.right_rotate(root)
+
+        # Right Right Case
+        if balance < -1 and self.get_balance(root.right) <= 0:
+            return self.left_rotate(root)
+
+        # Right Left Case
+        if balance < -1 and self.get_balance(root.right) > 0:
+            root.right = self.right_rotate(root.right)
+            return self.left_rotate(root)
+
         return root
 
-    # Function to remove a room number from the BST
-    def remove_room(self, key):
-        self.root = self.delete_node(self.root, key)
+    def left_rotate(self, z):
+        y = z.right
+        T2 = y.left
 
-    # Inorder traversal of the BST (sorted room numbers)
+        # Perform rotation
+        y.left = z
+        z.right = T2
+
+        # Update heights
+        z.height = 1 + max(self.get_height(z.left), self.get_height(z.right))
+        y.height = 1 + max(self.get_height(y.left), self.get_height(y.right))
+
+        return y
+
+    def right_rotate(self, z):
+        y = z.left
+        T3 = y.right
+
+        # Perform rotation
+        y.right = z
+        z.left = T3
+
+        # Update heights
+        z.height = 1 + max(self.get_height(z.left), self.get_height(z.right))
+        y.height = 1 + max(self.get_height(y.left), self.get_height(y.right))
+
+        return y
+
+    def get_height(self, node):
+        if not node:
+            return 0
+        return node.height
+
+    def get_balance(self, node):
+        if not node:
+            return 0
+        return self.get_height(node.left) - self.get_height(node.right)
+
+    def min_value_node(self, node):
+        current = node
+        while current.left is not None:
+            current = current.left
+        return current
+
     def inorder_traversal(self, root, sorted_rooms):
         if root:
             self.inorder_traversal(root.left, sorted_rooms)
             sorted_rooms.append(root.key)
             self.inorder_traversal(root.right, sorted_rooms)
 
-    # Get sorted list of room numbers
     def get_sorted_rooms(self):
         sorted_rooms = []
         self.inorder_traversal(self.root, sorted_rooms)
@@ -129,7 +210,8 @@ class HilbertsHotel:
         self.rooms = HashMap()  # HashMap to store guest data
         self.empty_rooms = set()  # Set to track empty rooms
         self.channel_data = HashMap()  # HashMap to store the channel from which the guest arrived
-        self.bst = RoomBST()  # Binary Search Tree for room number sorting
+        self.avl_tree = AVLTree()  # AVL Tree for room number sorting
+        self.avl_tree.root = None  # Initialize root of AVL tree
 
     # Function to add a guest manually
     def add_guest(self, room_number, channel):
@@ -139,7 +221,7 @@ class HilbertsHotel:
         else:
             self.rooms.insert(room_number, True)
             self.channel_data.insert(room_number, channel)
-            self.bst.add_room(room_number)  # Add room number to BST
+            self.avl_tree.root = self.avl_tree.insert(self.avl_tree.root, room_number)  # Add room number to AVL Tree
             if room_number in self.empty_rooms:
                 self.empty_rooms.remove(room_number)
             print(f"Guest added to room {room_number} from channel {channel}.")
@@ -152,7 +234,7 @@ class HilbertsHotel:
         if self.rooms.contains(room_number):
             self.rooms.remove(room_number)
             self.channel_data.remove(room_number)
-            self.bst.remove_room(room_number)  # Remove room number from BST
+            self.avl_tree.root = self.avl_tree.delete_node(self.avl_tree.root, room_number)  # Remove room number from AVL Tree
             self.empty_rooms.add(room_number)
             print(f"Guest removed from room {room_number}.")
         else:
@@ -163,7 +245,7 @@ class HilbertsHotel:
     # Function to sort room numbers
     def sort_rooms(self):
         start_time = time.time()
-        sorted_rooms = self.bst.get_sorted_rooms()
+        sorted_rooms = self.avl_tree.get_sorted_rooms()
         end_time = time.time()
         print(f"Sorted rooms: {sorted_rooms}")
         print(f"Time to sort rooms: {end_time - start_time:.6f} seconds.")
@@ -212,28 +294,11 @@ class HilbertsHotel:
 # Example of using the HilbertsHotel class
 if __name__ == "__main__":
     hotel = HilbertsHotel()
-    chanel = ['chanel 1', 'chanel 2', 'chanel 3']
-
-########################################
-#    # import random                   #
-#    # list1 = [1, 2, 3, 4, 5, 6]      #
-#    # print(random.choice(list1))     #
-########################################
+    chanel = ['Channel 1', 'Channel 2', 'Channel 3']
 
     # Adding guests to rooms
-    # hotel.add_guest(1, 'Channel 1')
-    for i in range(100000) :
+    for i in range(2000000):
         hotel.add_guest(i, ch(chanel))
-
-    # Removing a guest from a room
-
-    # Sorting rooms
-
-    # Searching for a specific room
-
-    # Displaying number of empty rooms
-
-    # Displaying memory usage
 
     # Writing data to file
     hotel.write_output_to_file('hilberts_hotel_output.txt')
