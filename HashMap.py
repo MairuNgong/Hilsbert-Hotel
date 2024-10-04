@@ -1,49 +1,40 @@
-class HashMap:
+class HashTable:
     def __init__(self, size=100):
         self.size = size
-        self.table = [[] for _ in range(size)]
+        self.table = [[] for _ in range(self.size)]
 
-    def _hash(self, key):
+    def hash_function(self, key):
         return hash(key) % self.size
 
-    # Insert a key-value pair into the HashMap
     def insert(self, key, value):
-        index = self._hash(key)
-        for pair in self.table[index]:
-            if pair[0] == key:
-                pair[1] = value
+        bucket_index = self.hash_function(key)
+        bucket = self.table[bucket_index]
+        for i, kv in enumerate(bucket):
+            k, v = kv
+            if key == k:
+                bucket[i] = (key, value)
                 return
-        self.table[index].append([key, value])
+        bucket.append((key, value))
 
-    # Retrieve a value by key from the HashMap
-    def get(self, key):
-        index = self._hash(key)
-        for pair in self.table[index]:
-            if pair[0] == key:
-                return pair[1]
+    def search(self, key):
+        bucket_index = self.hash_function(key)
+        bucket = self.table[bucket_index]
+        for k, v in bucket:
+            if key == k:
+                return v
         return None
 
-    # Delete a key-value pair from the HashMap
     def remove(self, key):
-        index = self._hash(key)
-        for i, pair in enumerate(self.table[index]):
-            if pair[0] == key:
-                del self.table[index][i]
+        bucket_index = self.hash_function(key)
+        bucket = self.table[bucket_index]
+        for i, kv in enumerate(bucket):
+            k, v = kv
+            if key == k:
+                del bucket[i]
                 return True
         return False
 
-    # Check if a key exists in the HashMap
-    def contains(self, key):
-        index = self._hash(key)
-        for pair in self.table[index]:
-            if pair[0] == key:
-                return True
-        return False
-
-    # Get all keys in the HashMap
-    def keys(self):
-        all_keys = []
-        for bucket in self.table:
-            for pair in bucket:
-                all_keys.append(pair[0])
-        return all_keys
+    def display(self):
+        for i, bucket in enumerate(self.table):
+            if bucket:
+                print(f"Bucket {i}: {bucket}")

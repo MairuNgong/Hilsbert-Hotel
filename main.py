@@ -1,94 +1,84 @@
-import time
+import pandas as pd
 import sys
-from HashMap import HashMap
+import time
 from AVLTree import AVLTree
-from random import choice as ch
+from HashMap import HashTable
 
-class HilbertsHotel:
-    def __init__(self):
-        self.rooms = HashMap()  # HashMap to store guest data
-        self.empty_rooms = set()  # Set to track empty rooms
-        self.channel_data = HashMap()  # HashMap to store the channel from which the guest arrived
-        self.avl_tree = AVLTree()  # AVL Tree for room number sorting
-        self.avl_tree.root = None  
-  
-    def add_guest(self, room_number, channel):
-        start_time = time.time()
-        if self.rooms.contains(room_number):
-            print(f"Room {room_number} is already occupied.")
-        else:
-            self.rooms.insert(room_number, True)
-            self.channel_data.insert(room_number, channel)
-            self.avl_tree.root = self.avl_tree.insert(self.avl_tree.root, room_number)  # Add room number to AVL Tree
-            if room_number in self.empty_rooms:
-                self.empty_rooms.remove(room_number)
-            print(f"Guest added to room {room_number} from channel {channel}.")
-        end_time = time.time()
-        print(f"Time to add guest: {end_time - start_time:.6f} seconds.")
+class Hotel:
+    def __init__(self, size=100):
+        self.avl_tree = AVLTree()
+        self.root = None
+        self.hash_table = HashTable(size)
+        self.max_room_number = 0
 
-    def remove_guest(self, room_number):
+    def calculate_room_number(self, fleet, ship, bus, guest):
+        return (fleet ** 7) * (ship ** 5) * (bus ** 3) * (guest ** 2)
+
+    def add_room(self, fleet, ship, bus, guest):
         start_time = time.time()
-        if self.rooms.contains(room_number):
-            self.rooms.remove(room_number)
-            self.channel_data.remove(room_number)
-            self.avl_tree.root = self.avl_tree.delete_node(self.avl_tree.root, room_number)  # Remove room number from AVL Tree
-            self.empty_rooms.add(room_number)
-            print(f"Guest removed from room {room_number}.")
-        else:
-            print(f"Room {room_number} is already empty.")
+        room_number = self.calculate_room_number(fleet, ship, bus, guest)
+        if self.hash_table.search(room_number) is None:
+            self.hash_table.insert(room_number, (fleet, ship, bus, guest))
+            self.max_room_number = max(self.max_room_number, room_number)
+            end_time = time.time()
+        print(f"Time taken for add_room: {end_time - start_time} seconds")
+        return room_number
+
+    def remove_room(self, room_number):
+        start_time = time.time()
+        if self.hash_table.search(room_number):
+            self.hash_table.remove(room_number)
         end_time = time.time()
-        print(f"Time to remove guest: {end_time - start_time:.6f} seconds.")
+        print(f"Time taken for remove_room: {end_time - start_time} seconds")
 
     def sort_rooms(self):
         start_time = time.time()
-        sorted_rooms = self.avl_tree.get_sorted_rooms()
+        result = []
+        self.avl_tree.inorder_traversal(self.root, result)
         end_time = time.time()
-        print(f"Sorted rooms: {sorted_rooms}")
-        print(f"Time to sort rooms: {end_time - start_time:.6f} seconds.")
-        return sorted_rooms
+        print(f"Time taken for sort_rooms: {end_time - start_time} seconds")
+        return result
 
-    def search_room(self, room_number):
+    def find_room(self, room_number):
         start_time = time.time()
-        if self.rooms.contains(room_number):
-            print(f"Room {room_number} is occupied by a guest.")
-        else:
-            print(f"Room {room_number} is empty.")
+        result = self.hash_table.search(room_number)
         end_time = time.time()
-        print(f"Time to search room: {end_time - start_time:.6f} seconds.")
+        print(f"Time taken for find_room: {end_time - start_time} seconds")
+        return result
 
-    def display_empty_rooms(self):
+    def empty_rooms(self):
         start_time = time.time()
-        total_empty = len(self.empty_rooms)
-        print(f"Number of empty rooms: {total_empty}")
+        total_rooms = self.max_room_number
+        room_count = sum(len(bucket) for bucket in self.hash_table.table)
         end_time = time.time()
-        print(f"Time to display empty rooms: {end_time - start_time:.6f} seconds.")
-        return total_empty
+        print(f"Time taken for empty_rooms: {end_time - start_time} seconds")
+        return total_rooms - room_count
 
-    def display_memory_usage(self):
-        rooms_memory = sys.getsizeof(self.rooms)
-        channel_data_memory = sys.getsizeof(self.channel_data)
-        empty_rooms_memory = sys.getsizeof(self.empty_rooms)
-        total_memory = rooms_memory + channel_data_memory + empty_rooms_memory
-        print(f"-->Memory usage (in bytes): Rooms: {rooms_memory}, Channel Data: {channel_data_memory}, Empty Rooms: {empty_rooms_memory}")
-        print(f"Total memory usage: {total_memory} bytes.")
-        return total_memory
-
-    def write_output_to_file(self, file_name):
+    def save_to_file(self, file_name):
         start_time = time.time()
-        with open(file_name, 'w') as f:
-            for room in self.rooms.keys():
-                channel = self.channel_data.get(room)
-                f.write(f"Room {room}, Channel = {channel}\n")
+        data = [(key, value) for bucket in self.hash_table.table for key, value in bucket]
+        df = pd.DataFrame(data, columns=["Room Number", "Details"])
+        df.to_csv(file_name, index=False)
         end_time = time.time()
-        print(f"Data written to {file_name}. Time: {end_time - start_time:.6f} seconds.")
+        print(f"Time taken for save_to_file: {end_time - start_time} seconds")
+
+    def memory_usage(self):
+        return sys.getsizeof(self.hash_table) + sys.getsizeof(self.root)
+
+hotel = Hotel(size=100)
+
+for i in range(2000) :
+    hotel.add_room(1, 1, 1, i)
 
 
-if __name__ == "__main__":
-    hotel = HilbertsHotel()
-    chanel = ['Channel 1', 'Channel 2', 'Channel 3']
+sorted_rooms = hotel.sort_rooms()
+print("Sorted Rooms:", sorted_rooms)
 
-    for i in range(1000):
-        hotel.add_guest(i, ch(chanel))
 
-    # Writing data to file
-    hotel.write_output_to_file('hilberts_hotel_output.txt')
+print("number of empty room:", hotel.empty_rooms())
+
+print("Find room 1050:", hotel.find_room(100))
+
+hotel.save_to_file("./hotel_rooms.csv")
+
+print("Memory Usage:", hotel.memory_usage())
