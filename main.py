@@ -5,16 +5,16 @@ from AVLTree import AVLTree
 from HashMap import HashTable
 
 class Hotel:
-    def __init__(self, size=100):
+    def __init__(self, size: int = 100):
         self.avl_tree = AVLTree()
         self.root = None
         self.hash_table = HashTable(size)
         self.max_room_number = 0
 
-    def calculate_room_number(self, fleet, ship, bus, guest):
+    def calculate_room_number(self, fleet: int, ship: int, bus: int, guest: int) -> int:
         return (fleet ** 7) * (ship ** 5) * (bus ** 3) * (guest ** 2)
 
-    def add_room(self, fleet, ship, bus, guest):
+    def add_room(self, fleet: int, ship: int, bus: int, guest: int) -> int:
         start_time = time.time()
         room_number = self.calculate_room_number(fleet, ship, bus, guest)
         if self.hash_table.search(room_number) is None:
@@ -24,7 +24,7 @@ class Hotel:
         print(f"Time taken for add_room: {end_time - start_time} seconds")
         return room_number
 
-    def remove_room(self, room_number):
+    def remove_room(self, room_number: int):
         start_time = time.time()
         if self.hash_table.search(room_number):
             self.hash_table.remove(room_number)
@@ -39,14 +39,14 @@ class Hotel:
         print(f"Time taken for sort_rooms: {end_time - start_time} seconds")
         return result
 
-    def find_room(self, room_number):
+    def find_room(self, room_number: int):
         start_time = time.time()
         result = self.hash_table.search(room_number)
         end_time = time.time()
         print(f"Time taken for find_room: {end_time - start_time} seconds")
         return result
 
-    def empty_rooms(self):
+    def empty_rooms(self) -> int:
         start_time = time.time()
         total_rooms = self.max_room_number
         room_count = sum(len(bucket) for bucket in self.hash_table.table)
@@ -54,7 +54,7 @@ class Hotel:
         print(f"Time taken for empty_rooms: {end_time - start_time} seconds")
         return total_rooms - room_count
 
-    def save_to_file(self, file_name):
+    def save_to_file(self, file_name: str):
         start_time = time.time()
         data = [(key, value) for bucket in self.hash_table.table for key, value in bucket]
         df = pd.DataFrame(data, columns=["Room Number", "Details"])
