@@ -28,7 +28,7 @@ class AVLTree:
         return y
 
     def insert(self, root, key):
-        if not root:
+        if root is None:
             return AVLNode(key)
         elif key < root.key:
             root.left = self.insert(root.left, key)

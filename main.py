@@ -4,12 +4,15 @@ import time
 from AVLTree import AVLTree
 from HashMap import HashTable
 
+import time
+
 def exec_time(func):
-    def wrapper(*arg,**kwargs):
-        start =time.time()
-        func(*arg, **kwargs)
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
         stop = time.time()
-        print(f"{func.__name__} takes {stop - start:.4f}")
+        print(f"{func.__name__} takes {stop - start:.4f} seconds")
+        return result
     return wrapper
 
 class Hotel:
@@ -27,6 +30,7 @@ class Hotel:
         room_number = self.calculate_room_number(fleet, ship, bus, guest)
         if self.hash_table.search(room_number) is None:
             self.hash_table.insert(room_number, (fleet, ship, bus, guest))
+            self.root = self.avl_tree.insert(self.root,room_number)
             self.max_room_number = max(self.max_room_number, room_number)
         return room_number
 
@@ -63,16 +67,24 @@ class Hotel:
 
 hotel = Hotel(size=100)
 
-for i in range(2000) :
-    hotel.add_room(1, 1, 1, i)
+for i in range(10) :
+    for j in range(3):
+        hotel.add_room(1,1,j,i)
 
 sorted_rooms = hotel.sort_rooms()
+
 print("Sorted Rooms:", sorted_rooms)
 
 
 print("number of empty room:", hotel.empty_rooms())
 
-print("Find room 1050:", hotel.find_room(100))
+
+
+print("Find room 128:", hotel.find_room(128))
+
+hotel.remove_room(128)
+
+print("Find room 128:", hotel.find_room(128))
 
 hotel.save_to_file("./hotel_rooms.csv")
 
