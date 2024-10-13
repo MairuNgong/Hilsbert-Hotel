@@ -21,9 +21,10 @@ class Hotel:
         self.root = None
         self.hash_table = HashTable(size)
         self.max_room_number = 0
+        self.total_colli = 0
 
     def calculate_room_number(self, fleet: int, ship: int, bus: int, guest: int) -> int:
-        return (fleet ** 7) * (ship ** 5) * (bus ** 3) * (guest ** 2)
+        return ((fleet+1) ** 7) * ((ship+1) ** 5) * ((bus+1) ** 3) * ((guest+1) ** 2)
 
     @exec_time
     def add_room(self, fleet: int, ship: int, bus: int, guest: int) -> int:
@@ -32,6 +33,17 @@ class Hotel:
             self.hash_table.insert(room_number, (fleet, ship, bus, guest))
             self.root = self.avl_tree.insert(self.root,room_number)
             self.max_room_number = max(self.max_room_number, room_number)
+        else:
+          i = 1  # Counter to track how many attempts
+          while self.hash_table.search(room_number) is not None:
+              self.total_colli += 1
+              room_number += i ** 2
+              i += 1
+          
+          self.hash_table.insert(room_number, (fleet, ship, bus, guest))
+          self.root = self.avl_tree.insert(self.root, room_number)
+          self.max_room_number = max(self.max_room_number, room_number)
+       
         return room_number
 
     @exec_time
@@ -67,24 +79,31 @@ class Hotel:
 
 hotel = Hotel(size=100)
 
+#add person only
 for i in range(10) :
-    for j in range(3):
-        hotel.add_room(1,1,j,i)
+    #Hotel start with room number 1
+    hotel.add_room(1,1,1,i)
+
+#add person on bus on ship on fleet
+for i in range(10) :
+    hotel.add_room(1,1,1,i)
+
+
+room_number = 2
 
 sorted_rooms = hotel.sort_rooms()
-
 print("Sorted Rooms:", sorted_rooms)
 
+print("Total Collision:", hotel.total_colli)
 
 print("number of empty room:", hotel.empty_rooms())
 
 
+print("Find room",room_number,":", hotel.find_room(room_number))
 
-print("Find room 128:", hotel.find_room(128))
-
-hotel.remove_room(128)
-
-print("Find room 128:", hotel.find_room(128))
+hotel.remove_room(room_number)
+print("Find room",room_number,":", hotel.find_room(room_number))
+print("number of empty room:", hotel.empty_rooms())
 
 hotel.save_to_file("./hotel_rooms.csv")
 
