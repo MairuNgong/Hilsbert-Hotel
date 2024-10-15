@@ -7,8 +7,8 @@ from HashMap import HashTable
 class Hotel:
     def __init__(self, size=100):
         self.avl_tree = AVLTree()
-        self.root = None
         self.hash_table = HashTable(size)
+        self.root = None
         self.max_room_number = 0
 
     def calculate_room_number(self, fleet, ship, bus, guest):
