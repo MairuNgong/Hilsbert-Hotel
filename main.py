@@ -24,7 +24,7 @@ class Hotel:
         self.total_colli = 0
 
     def calculate_room_number(self, fleet: int, ship: int, bus: int, guest: int) -> int:
-        return ((fleet+1) ** 7) * ((ship+1) ** 5) * ((bus+1) ** 3) * ((guest+1) ** 2)
+        return ((fleet + 1) ** 7) * ((ship + 1) ** 5) * ((bus + 1) ** 3) * ((guest + 1) ** 2)
 
     @exec_time
     def add_room(self, fleet: int, ship: int, bus: int, guest: int) -> int:
@@ -82,11 +82,11 @@ hotel = Hotel(size=100)
 #add person only
 for i in range(10) :
     #Hotel start with room number 1
-    hotel.add_room(1,1,1,i)
+    hotel.add_room(0,0,0,i)
 
 #add person on bus on ship on fleet
-for i in range(10) :
-    hotel.add_room(1,1,1,i)
+# for i in range(10) :
+#     hotel.add_room(1,1,1,i)
 
 
 room_number = 2
