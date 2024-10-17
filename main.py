@@ -24,7 +24,8 @@ class Hotel:
         self.total_colli = 0
 
     def calculate_room_number(self, fleet: int, ship: int, bus: int, guest: int) -> int:
-        return ((fleet + 1) ** 7) * ((ship + 1) ** 5) * ((bus + 1) ** 3) * ((guest + 1) ** 2)
+        return ((fleet+1) ** 7) * ((ship+1) ** 5) * ((bus+1) ** 3) * ((guest+1) ** 2)
+        
 
     @exec_time
     def add_room(self, fleet: int, ship: int, bus: int, guest: int) -> int:
@@ -79,32 +80,70 @@ class Hotel:
 
 hotel = Hotel(size=100)
 
-#add person only
-for i in range(10) :
-    #Hotel start with room number 1
-    hotel.add_room(0,0,0,i)
 
-#add person on bus on ship on fleet
-# for i in range(10) :
-#     hotel.add_room(1,1,1,i)
+initial_guest = int(input("Initail Guest: "))
+for i in range(initial_guest) :
+    hotel.add_room(0, 0, 0, i)
+while (True) :
+    print("===================================")
+    print("MENU: ")
+    print("1. add guest")
+    print("2. print sort room")
+    print("3. print empty room")
+    print("4. search room")
+    print("5. remove room")
+    print("6. save to file")
+    print("x. exit..")
+    opt = input("select: ")
+    if opt == '1' :
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print("1.  add n guest")
+        print("2.  add n guest on m bus")
+        print("3.  add n guest on m bus on l ship")
+        print("4.  add n guest on m bus on l ship in k fleet")
+        opt = input("select: ")
+        if opt == "1" :
+            print("add n guest")
+            n = int(input("n = "))
+            for a in range(n) : hotel.add_room(0, 0, 0, a)
+        elif opt == "2" :
+            print("add n guest on m bus")
+            n = int(input("n = "))
+            m = int(input("m = "))
+            for b in range(m) :
+                for a in range(n) : hotel.add_room(0, 0, b, a)
+        elif opt == "3" :
+            print("add n guest on m bus on l ship")
+            n = int(input("n = "))
+            m = int(input("m = "))
+            l = int(input("l = "))
+            for c in range(l) :
+                for b in range(m) :
+                    for a in range(n) : hotel.add_room(0, c, b, a)
+        elif opt == "4" :
+            print("add n guest on m bus on l ship in k fleet")
+            n = int(input("n = "))
+            m = int(input("m = "))
+            l = int(input("l = "))
+            k = int(input("k = "))
+            for d in range(k) :
+                for c in range(l) :
+                    for b in range(m) :
+                        for a in range(n) : hotel.add_room(d, c, b, a)
 
-
-room_number = 2
-
-sorted_rooms = hotel.sort_rooms()
-print("Sorted Rooms:", sorted_rooms)
-
-print("Total Collision:", hotel.total_colli)
-
-print("number of empty room:", hotel.empty_rooms())
-
-
-print("Find room",room_number,":", hotel.find_room(room_number))
-
-hotel.remove_room(room_number)
-print("Find room",room_number,":", hotel.find_room(room_number))
-print("number of empty room:", hotel.empty_rooms())
-
-hotel.save_to_file("./hotel_rooms.csv")
-
-print("Memory Usage:", hotel.memory_usage())
+    elif opt == '2' :
+        print("Sorted Rooms:", hotel.sort_rooms())
+    elif opt == '3' :
+        print("Empty Rooms:", hotel.empty_rooms())
+    elif opt == '4' :
+        room_number = int(input("room number : "))
+        print("Find room",room_number,":", hotel.find_room(room_number))
+    elif opt == '5' :
+        room_number = int(input("room number : "))
+        hotel.remove_room(room_number)
+    elif opt == '6' :
+        hotel.save_to_file("./hotel_rooms.csv")
+    elif opt == 'x' :
+        break
+    else :
+        print("selection invalid!")
