@@ -35,16 +35,16 @@ class Hotel:
             self.root = self.avl_tree.insert(self.root,room_number)
             self.max_room_number = max(self.max_room_number, room_number)
         else:
-          i = 1  # Counter to track how many attempts
-          while self.hash_table.search(room_number) is not None:
-              self.total_colli += 1
-              room_number += i ** 2
-              i += 1
-          
-          self.hash_table.insert(room_number, (fleet, ship, bus, guest))
-          self.root = self.avl_tree.insert(self.root, room_number)
-          self.max_room_number = max(self.max_room_number, room_number)
-       
+            i = 1  # Counter to track how many attempts
+            while self.hash_table.search(room_number) is not None:
+                self.total_colli += 1
+                room_number += i ** 2
+                i += 1
+    
+        self.hash_table.insert(room_number, (fleet, ship, bus, guest))
+        self.root = self.avl_tree.insert(self.root, room_number)
+        self.max_room_number = max(self.max_room_number, room_number)
+    
         return room_number
 
     @exec_time
