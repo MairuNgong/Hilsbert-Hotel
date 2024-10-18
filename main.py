@@ -103,13 +103,13 @@ while (True) :
         if opt == "1" :
             print("add n guest")
             n = int(input("n = "))
-            for a in range(n) : hotel.add_room(0, 0, 0, b)
+            for a in range(n) : hotel.add_room(0, 0, 0, a)
         elif opt == "2" :
             print("add n guest on m bus")
             n = int(input("n = "))
             m = int(input("m = "))
             for b in range(m) :
-                for a in range(n) : hotel.add_room(0, 0, a, b)
+                for a in range(n) : hotel.add_room(0, 0, b, a)
         elif opt == "3" :
             print("add n guest on m bus on l ship")
             n = int(input("n = "))
