@@ -9,7 +9,7 @@ class HashTable:
                 print(f"Bucket {i}: {bucket}")
 
     def hash_key(self, key) -> int:
-        return hash(key) % self.size
+        return key % self.size
 
     def insert(self, key, value):
         bucket_index = self.hash_key(key)
