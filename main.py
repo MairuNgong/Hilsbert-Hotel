@@ -18,10 +18,9 @@ def exec_time(func):
 class Hotel:
     def __init__(self, size: int = 100):
         self.avl_tree = AVLTree()
-        self.root = None
         self.hash_table = HashTable(size)
+        self.root = None
         self.max_room_number = 0
-        self.total_colli = 0
 
     def calculate_room_number(self, fleet: int, ship: int, bus: int, guest: int) -> int:
         return ((fleet+1) ** 7) * ((ship+1) ** 5) * ((bus+1) ** 3) * ((guest+1) ** 2)
@@ -35,9 +34,8 @@ class Hotel:
             self.root = self.avl_tree.insert(self.root,room_number)
             self.max_room_number = max(self.max_room_number, room_number)
         else:
-          i = 1  # Counter to track how many attempts
+          i = 1 
           while self.hash_table.search(room_number) is not None:
-              self.total_colli += 1
               room_number += i ** 2
               i += 1
           
@@ -80,10 +78,10 @@ class Hotel:
 
 hotel = Hotel(size=100)
 
-
 initial_guest = int(input("Initail Guest: "))
 for i in range(initial_guest) :
     hotel.add_room(0, 0, 0, i)
+print(hotel.hash_table)
 while (True) :
     print("===================================")
     print("MENU: ")

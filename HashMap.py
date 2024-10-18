@@ -5,8 +5,9 @@ class HashTable:
 
     def __str__(self):
         for i, bucket in enumerate(self.table):
-            if bucket:
+            if bucket and len(bucket) != 0:
                 print(f"Bucket {i}: {bucket}")
+        return ""
 
     def hash_key(self, key) -> int:
         return key % self.size
@@ -14,11 +15,6 @@ class HashTable:
     def insert(self, key, value):
         bucket_index = self.hash_key(key)
         bucket = self.table[bucket_index]
-        for i, kv in enumerate(bucket):
-            k, v = kv
-            if key == k:
-                bucket[i] = (key, value)
-                return
         bucket.append((key, value))
 
     def search(self, key):
