@@ -49,6 +49,7 @@ class Hotel:
     def remove_room(self, room_number: int):
         if self.hash_table.search(room_number):
             self.hash_table.remove(room_number)
+            self.root = self.avl_tree.remove(self.root, room_number)
 
     @exec_time
     def sort_rooms(self):
