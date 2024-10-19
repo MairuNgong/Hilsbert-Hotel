@@ -140,7 +140,7 @@ while (True) :
         room_number = int(input("room number : "))
         hotel.remove_room(room_number)
     elif opt == '6' :
-        hotel.save_to_file("./csv/hotel_rooms.csv")
+        hotel.save_to_file("./hotel_rooms.csv")
     elif opt == 'x' :
         break
     else :
